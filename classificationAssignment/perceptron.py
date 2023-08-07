@@ -10,6 +10,7 @@
 # Perceptron implementation
 import util
 import heapq
+import random
 
 PRINT = True
 
@@ -49,28 +50,19 @@ class PerceptronClassifier:
         for iteration in range(self.max_iterations):
             print("Starting iteration ", iteration, "...")
             for i in range(len(trainingData)):
-                "*** YOUR CODE HERE ***"
                 #compute score for each label:
-                scores = {}
+                scores = []
                 for label in self.legalLabels:
-                    scores[label] = trainingData[i]*self.weights[label]
-                    # score = 0
-                    # for feature in self.features:
-                    #     score += trainingData[i][feature]*self.weights[label][feature]
-                    # scores[label] = score
+                    scores.append((label, trainingData[i]*self.weights[label]))
 
+                random.shuffle(scores)
                 #find the most optimum label:
-                guess_label = max(scores, key=scores.get)
+                guess_label = max(scores, key=lambda x:x[1])[0]
 
-                #update weight if necessary:
                 actual_label = trainingLabels[i]
                 if guess_label != actual_label:
                     self.weights[actual_label] += trainingData[i]
                     self.weights[guess_label] -= trainingData[i]
-                    # for feature in self.features:
-                    #     self.weights[actual_label][feature] += trainingData[i][feature]
-                    #     self.weights[guess_label][feature] -= trainingData[i][feature]
-
         print("finished training")
 
 

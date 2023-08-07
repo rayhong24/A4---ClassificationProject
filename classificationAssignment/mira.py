@@ -9,6 +9,7 @@
 
 # Mira implementation
 import util
+import heapq
 PRINT = True
 
 class MiraClassifier:
@@ -64,6 +65,28 @@ class MiraClassifier:
         cGrid.sort(reverse=True)
         bestParams = cGrid[0]
         "*** YOUR CODE HERE ***"
+        self.features = trainingData[0].keys() # could be useful later
+        # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING
+
+        for iteration in range(self.max_iterations):
+            print("Starting iteration ", iteration, "...")
+            for i in range(len(trainingData)):
+                #compute score for each label:
+                scores = {}
+                for label in self.legalLabels:
+                    scores[label] = trainingData[i]*self.weights[label]
+
+                #find the most optimum label:
+                guess_label = max(scores, key=scores.get)
+
+                #update weight if necessary:
+                actual_label = trainingLabels[i]
+                if guess_label != actual_label:
+                    tau = self.weights[guess_label]-self.weights[actual_label]
+                    # tau *= 
+
+                    # tau = min(cGrid[0], )
+
         util.raiseNotDefined()
 
         print("finished training. Best cGrid param = ", bestParams)
@@ -87,7 +110,18 @@ class MiraClassifier:
         """
         featuresWeights = []
 
+        num_in_q = 0
+        q = []
+
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for feature in self.weights[label]:
+            if num_in_q >= 100:
+                heapq.heappushpop(q, (self.weights[label][feature], feature))
+            else:
+                heapq.heappush(q, (self.weights[label][feature], feature))
+                num_in_q += 1
+        
+        for w, f in q:
+            featuresWeights.append(f)
 
         return featuresWeights
