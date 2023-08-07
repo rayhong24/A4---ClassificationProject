@@ -84,7 +84,7 @@ class MiraClassifier:
                 f = trainingData[i]
                 scores = []
                 for label in self.legalLabels:
-                    scores.append((label, trainingData[i]*self.weights[label]))
+                    scores.append((label, trainingData[i]*weights[label]))
 
                 #find the most optimum label:
                 guess_label = max(scores[::-1], key=lambda x:x[1])[0]
