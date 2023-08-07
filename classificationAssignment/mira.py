@@ -60,36 +60,70 @@ class MiraClassifier:
         datum is a counter from features to values for those features
         representing a vector of values.
         """
-
         bestAccuracyCount = -1  # best accuracy so far on validation set
-        cGrid.sort(reverse=True)
+        # cGrid.sort(reverse=True)
         bestParams = cGrid[0]
-        "*** YOUR CODE HERE ***"
         self.features = trainingData[0].keys() # could be useful later
         # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING
+        for c in cGrid:
+            accuracy, weights = self.get_c_accuracy(trainingData, trainingLabels, validationData, validationLabels, c)
+            if accuracy > bestAccuracyCount:
+                bestAccuracyCount = accuracy
+                self.weights = weights
 
+        print("finished training. Best cGrid param = ", bestParams)
+
+    def get_c_accuracy(self, trainingData, trainingLabels, validationData, validationLabels, c):
+        weights = self.weights.copy()
+
+        max_accuracy = -1
+        max_weights = weights
         for iteration in range(self.max_iterations):
             print("Starting iteration ", iteration, "...")
             for i in range(len(trainingData)):
-                #compute score for each label:
-                scores = {}
+                f = trainingData[i]
+                scores = []
                 for label in self.legalLabels:
-                    scores[label] = trainingData[i]*self.weights[label]
+                    scores.append((label, trainingData[i]*self.weights[label]))
 
                 #find the most optimum label:
-                guess_label = max(scores, key=scores.get)
+                guess_label = max(scores[::-1], key=lambda x:x[1])[0]
 
-                #update weight if necessary:
+                #calculate new weight if necessary:
                 actual_label = trainingLabels[i]
                 if guess_label != actual_label:
-                    tau = self.weights[guess_label]-self.weights[actual_label]
-                    # tau *= 
+                    diff = weights[guess_label]-weights[actual_label]
+                    numerator = diff*f+1
+                    denominator = f*f*2
 
-                    # tau = min(cGrid[0], )
+                    tau = min(c, numerator/denominator)
 
-        util.raiseNotDefined()
+                    f_times_tau = f.copy()
+                    f_times_tau.multiplyAll(tau)
 
-        print("finished training. Best cGrid param = ", bestParams)
+                    weights[actual_label] += f_times_tau
+                    weights[guess_label] -= f_times_tau
+
+            #calculate accuracy
+            correct_count = 0 
+            for i in range(len(validationData)):
+                f = validationData[i]
+                actual_label = validationLabels[i]
+
+                best_score, guess_label = max([(f*weights[label], label) for label in self.legalLabels])
+
+                if guess_label == actual_label:
+                    correct_count += 1
+                
+            accuracy = correct_count / len(validationData)
+
+            if accuracy > max_accuracy:
+                max_accuracy = accuracy
+                max_weights = weights.copy()
+            print("iteration", iteration, "c =", c, "accuracy =", accuracy)
+
+        return max_accuracy, max_weights
+
 
     def classify(self, data):
         """
@@ -99,8 +133,11 @@ class MiraClassifier:
         Recall that a datum is a util.counter...
         """
         guesses = []
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for datum in data:
+            vectors = util.Counter()
+            for l in self.legalLabels:
+                vectors[l] = self.weights[l] * datum
+            guesses.append(vectors.argMax())
         return guesses
 
 
@@ -113,7 +150,6 @@ class MiraClassifier:
         num_in_q = 0
         q = []
 
-        "*** YOUR CODE HERE ***"
         for feature in self.weights[label]:
             if num_in_q >= 100:
                 heapq.heappushpop(q, (self.weights[label][feature], feature))
