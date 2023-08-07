@@ -150,15 +150,13 @@ class MiraClassifier:
         """
         featuresWeights = []
 
-        num_in_q = 0
         q = []
 
         for feature in self.features:
-            if num_in_q >= 100:
+            if len(q) >= 100:
                 heapq.heappushpop(q, (self.weights[label][feature], feature))
             else:
                 heapq.heappush(q, (self.weights[label][feature], feature))
-                num_in_q += 1
         
         for w, f in q:
             featuresWeights.append(f)

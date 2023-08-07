@@ -74,13 +74,12 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
         for i in range(len(trainingData)):
             datum = trainingData[i]
             label = trainingLabels[i]
-            "*** YOUR CODE HERE to complete populating commonPrior, commonCounts, and commonConditionalProb ***"
             for feature, value in datum.items():
                 commonCounts[(feature, label)] += 1
                 if value == 1:
                     commonConditionalProb[(feature, label)] += 1
 
-            commonPrior[trainingLabels[i]] += 1
+            commonPrior[label] += 1
 
         for k in kgrid: # Smoothing parameter tuning loop!
             prior = util.Counter()
@@ -164,16 +163,14 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
          """
         featuresOdds = []
 
-        num_in_q = 0
         q = []
 
         for feature in self.features:
             odds_ratio = self.conditionalProb[(feature, label1)] / self.conditionalProb[(feature, label2)]
-            if num_in_q >= 100:
+            if len(q) >= 100:
                 heapq.heappushpop(q, (odds_ratio, feature))
             else:
                 heapq.heappush(q, (odds_ratio, feature))
-                num_in_q += 1
         
         for w, f in q:
             featuresOdds.append(f)
