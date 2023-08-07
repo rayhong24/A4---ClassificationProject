@@ -156,23 +156,26 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
                     logJoint[label] += math.log(self.conditionalProb[(feature, label)])
 
         return logJoint
-    def findHighWeightFeatures(self, label):
+    def findHighOddsFeatures(self, label1, label2):
         """
-        Returns a list of the 100 features with the greatest weight for some label
-        """
-        featuresWeights = []
+         Returns the 100 best features for the odds ratio:
+                 P(feature=1 | label1)/P(feature=1 | label2)
+         Note: you may find 'self.features' a useful way to loop through all possible features
+         """
+        featuresOdds = []
 
         num_in_q = 0
         q = []
 
-        for feature in self.weights[label]:
+        for feature in self.features:
+            odds_ratio = self.conditionalProb[(feature, label1)] / self.conditionalProb[(feature, label2)]
             if num_in_q >= 100:
-                heapq.heappushpop(q, (self.weights[label][feature], feature))
+                heapq.heappushpop(q, (odds_ratio, feature))
             else:
-                heapq.heappush(q, (self.weights[label][feature], feature))
+                heapq.heappush(q, (odds_ratio, feature))
                 num_in_q += 1
         
         for w, f in q:
-            featuresWeights.append(f)
+            featuresOdds.append(f)
 
-        return featuresWeights
+        return featuresOdds

@@ -92,7 +92,7 @@ class PerceptronClassifier:
         q = []
 
         "*** YOUR CODE HERE ***"
-        for feature in self.weights[label]:
+        for feature in self.features:
             if num_in_q >= 100:
                 heapq.heappushpop(q, (self.weights[label][feature], feature))
             else:
