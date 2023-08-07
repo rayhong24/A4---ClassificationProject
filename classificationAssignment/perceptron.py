@@ -48,14 +48,23 @@ class PerceptronClassifier:
             print("Starting iteration ", iteration, "...")
             for i in range(len(trainingData)):
                 "*** YOUR CODE HERE ***"
-                print("perceptron: train(). to be done by students")
                 #compute score for each label:
+                scores = {}
+                for label in self.legalLabels:
+                    score = 0
+                    for feature in self.features:
+                        score += trainingData[i][feature]*self.weights[label][feature]
+                    scores[label] = score
 
                 #find the most optimum label:
-
+                guess_label = max(scores, key=scores.get)
 
                 #update weight if necessary:
-
+                actual_label = trainingLabels[i]
+                if guess_label != actual_label:
+                    for feature in self.features:
+                        self.weights[actual_label][feature] += trainingData[i][feature]
+                        self.weights[guess_label][feature] -= trainingData[i][feature]
 
         print("finished training")
 
