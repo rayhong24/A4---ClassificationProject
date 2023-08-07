@@ -62,9 +62,11 @@ class PerceptronClassifier:
                 #update weight if necessary:
                 actual_label = trainingLabels[i]
                 if guess_label != actual_label:
-                    for feature in self.features:
-                        self.weights[actual_label][feature] += trainingData[i][feature]
-                        self.weights[guess_label][feature] -= trainingData[i][feature]
+                    self.weights[actual_label] += trainingData[i]
+                    self.weights[guess_label] -= trainingData[i]
+                    # for feature in self.features:
+                    #     self.weights[actual_label][feature] += trainingData[i][feature]
+                    #     self.weights[guess_label][feature] -= trainingData[i][feature]
 
         print("finished training")
 
