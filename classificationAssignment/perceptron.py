@@ -51,10 +51,11 @@ class PerceptronClassifier:
                 #compute score for each label:
                 scores = {}
                 for label in self.legalLabels:
-                    score = 0
-                    for feature in self.features:
-                        score += trainingData[i][feature]*self.weights[label][feature]
-                    scores[label] = score
+                    scores[label] = trainingData[i]*self.weights[label]
+                    # score = 0
+                    # for feature in self.features:
+                    #     score += trainingData[i][feature]*self.weights[label][feature]
+                    # scores[label] = score
 
                 #find the most optimum label:
                 guess_label = max(scores, key=scores.get)
