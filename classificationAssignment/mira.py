@@ -10,6 +10,7 @@
 # Mira implementation
 import util
 import heapq
+import random
 PRINT = True
 
 class MiraClassifier:
@@ -85,6 +86,8 @@ class MiraClassifier:
                 scores = []
                 for label in self.legalLabels:
                     scores.append((label, trainingData[i]*weights[label]))
+
+                random.shuffle(scores)
 
                 #find the most optimum label:
                 guess_label = max(scores[::-1], key=lambda x:x[1])[0]
