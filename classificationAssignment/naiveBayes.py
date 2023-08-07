@@ -9,6 +9,7 @@
 import util
 import classificationMethod
 import math
+import heapq
 
 class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     """
@@ -74,7 +75,12 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
             datum = trainingData[i]
             label = trainingLabels[i]
             "*** YOUR CODE HERE to complete populating commonPrior, commonCounts, and commonConditionalProb ***"
-            util.raiseNotDefined()
+            for feature, value in datum.items():
+                commonCounts[(feature, label)] += 1
+                if value == 1:
+                    commonConditionalProb[(feature, label)] += 1
+
+            commonPrior[trainingLabels[i]] += 1
 
         for k in kgrid: # Smoothing parameter tuning loop!
             prior = util.Counter()
@@ -141,21 +147,32 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
 
         for label in self.legalLabels:
             "*** YOUR CODE HERE, to populate logJoint() list ***"
-            util.raiseNotDefined()
-
+            logJoint[label] = math.log(self.prior[label])
+            for feature, value in datum.items():
+                if value == 0:
+                    x = 1 - self.conditionalProb[(feature, label)]
+                    logJoint[label] += math.log(x if x > 0 else 1)
+                else:
+                    logJoint[label] += math.log(self.conditionalProb[(feature, label)])
 
         return logJoint
-
-    def findHighOddsFeatures(self, label1, label2):
+    def findHighWeightFeatures(self, label):
         """
-        Returns the 100 best features for the odds ratio:
-                P(feature=1 | label1)/P(feature=1 | label2)
-
-        Note: you may find 'self.features' a useful way to loop through all possible features
+        Returns a list of the 100 features with the greatest weight for some label
         """
-        featuresOdds = []
+        featuresWeights = []
 
-        "*** YOUR CODE HERE, to populate featureOdds based on above formula. ***"
-        util.raiseNotDefined()
+        num_in_q = 0
+        q = []
 
-        return featuresOdds
+        for feature in self.weights[label]:
+            if num_in_q >= 100:
+                heapq.heappushpop(q, (self.weights[label][feature], feature))
+            else:
+                heapq.heappush(q, (self.weights[label][feature], feature))
+                num_in_q += 1
+        
+        for w, f in q:
+            featuresWeights.append(f)
+
+        return featuresWeights
