@@ -149,8 +149,7 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
             logJoint[label] = math.log(self.prior[label])
             for feature, value in datum.items():
                 if value == 0:
-                    x = 1 - self.conditionalProb[(feature, label)]
-                    logJoint[label] += math.log(x)
+                    logJoint[label] += math.log(1 - self.conditionalProb[(feature, label)])
                 else:
                     logJoint[label] += math.log(self.conditionalProb[(feature, label)])
 
