@@ -154,9 +154,9 @@ def enhancedFeatureExtractorDigit(datum):
                 break
             # print(x, y, datum.getPixel(x, y) == 0 and (is_surrounded(x, y)))
 
-    print(datum.getAsciiString())
-    print(f"{features['left_side_heavy']}")
-    print(f"{features['right_side_heavy']}")
+    # print(datum.getAsciiString())
+    # print(f"{features['left_side_heavy']}")
+    # print(f"{features['right_side_heavy']}")
 
     return features
 
