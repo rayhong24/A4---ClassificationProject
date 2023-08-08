@@ -76,7 +76,7 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
             label = trainingLabels[i]
             for feature, value in datum.items():
                 commonCounts[(feature, label)] += 1
-                if value == 1:
+                if value >= 1:
                     commonConditionalProb[(feature, label)] += 1
 
             commonPrior[label] += 1
