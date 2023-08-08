@@ -7,6 +7,5 @@
 #
 
 def q2():
-    "*** YOUR CODE HERE ***"
     """Provide your answer a or b and return it bellow, and remove the string"""
     return "a"

@@ -76,7 +76,7 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
             label = trainingLabels[i]
             for feature, value in datum.items():
                 commonCounts[(feature, label)] += 1
-                if value >= 1:
+                if value > 0:
                     commonConditionalProb[(feature, label)] += 1
 
             commonPrior[label] += 1
@@ -166,10 +166,12 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
 
         for feature in self.features:
             odds_ratio = self.conditionalProb[(feature, label1)] / self.conditionalProb[(feature, label2)]
-            if len(q) >= 100:
-                heapq.heappushpop(q, (odds_ratio, feature))
-            else:
-                heapq.heappush(q, (odds_ratio, feature))
+
+            if type(feature) != str:
+                if len(q) >= 100:
+                    heapq.heappushpop(q, (odds_ratio, feature))
+                else:
+                    heapq.heappush(q, (odds_ratio, feature))
         
         for w, f in q:
             featuresOdds.append(f)

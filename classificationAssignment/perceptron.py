@@ -91,10 +91,11 @@ class PerceptronClassifier:
         q = []
 
         for feature in self.features:
-            if len(q) >= 100:
-                heapq.heappushpop(q, (self.weights[label][feature], feature))
-            else:
-                heapq.heappush(q, (self.weights[label][feature], feature))
+            if type(feature) != str:
+                if len(q) >= 100:
+                    heapq.heappushpop(q, (self.weights[label][feature], feature))
+                else:
+                    heapq.heappush(q, (self.weights[label][feature], feature))
         
         for w, f in q:
             featuresWeights.append(f)

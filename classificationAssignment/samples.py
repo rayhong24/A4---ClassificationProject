@@ -90,9 +90,9 @@ class Datum:
         """
         rows = []
         data = util.arrayInvert(self.pixels)
-        for row in data:
+        for i, row in enumerate(data):
             ascii = map(asciiGrayscaleConversionFunction, row)
-            rows.append( "".join(ascii) )
+            rows.append( "".join(ascii))
         return "\n".join(rows)
 
     def __str__(self):
