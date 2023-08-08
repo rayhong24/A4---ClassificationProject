@@ -17,6 +17,7 @@ import mira
 import samples
 import sys
 import util
+from functools import cache
 
 TEST_SET_SIZE = 100
 DIGIT_DATUM_WIDTH=28
@@ -65,12 +66,97 @@ def enhancedFeatureExtractorDigit(datum):
 
     ## DESCRIBE YOUR ENHANCED FEATURES HERE...
 
+        1. Has a horizontal line in the top third
+        2. Has a horizontal line in the middle third
+        3. Has a hole
+        4. Connected first line
     ##
     """
-    features =  basicFeatureExtractorDigit(datum)
+    features = basicFeatureExtractorDigit(datum)
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    features["horizontal_in_top_third"] = 0
+    features["horizontal_in_mid_third"] = 0
+    features["has_hole"] = 0
+    features["left_side_heavy"] = 0
+    features["right_side_heavy"] = 0
+
+
+    # horizontal line in top third
+    for y in range(DIGIT_DATUM_HEIGHT//3):
+        acceptance_threshold = 0.3
+        pixels_on_in_row_percent = sum(datum.getPixel(x, y) >= 1 for x in range(DIGIT_DATUM_WIDTH)) / DIGIT_DATUM_WIDTH
+        if pixels_on_in_row_percent >= acceptance_threshold:
+            features["horizontal_in_top_third"] = 1
+
+    # horizontal line in the middle third
+    for y in range(DIGIT_DATUM_HEIGHT//3, DIGIT_DATUM_HEIGHT*2//3):
+        acceptance_threshold = 0.5
+        pixels_on_in_row_percent = sum(datum.getPixel(x, y) >= 1 for x in range(DIGIT_DATUM_WIDTH)) / DIGIT_DATUM_WIDTH
+        if pixels_on_in_row_percent >= acceptance_threshold:
+            features["horizontal_in_mid_third"] = 1
+
+    left_sum = 0
+    right_sum = 0
+
+    left_most_pixel = DIGIT_DATUM_WIDTH
+    right_most_pixel = 0
+
+    for y in range(DIGIT_DATUM_HEIGHT):
+        for x in range(DIGIT_DATUM_WIDTH):
+            if datum.getPixel(x, y) >= 1:
+                left_most_pixel = min(left_most_pixel, x)
+                right_most_pixel = max(right_most_pixel, x)
+
+    mid = left_most_pixel + (right_most_pixel - left_most_pixel) // 2
+
+    for y in range(DIGIT_DATUM_HEIGHT):
+        for x in range(DIGIT_DATUM_WIDTH):
+            if datum.getPixel(x, y) >= 1:
+                if x <= mid:
+                    left_sum += 1
+                else:
+                    right_sum += 1
+
+    if left_sum - right_sum >= 10:
+        features["left_side_heavy"] = True
+    elif right_sum - left_sum >= 10:
+        features["right_side_heavy"] = True
+        
+    def is_surrounded(x, y):
+        if 0 > x or x >= DIGIT_DATUM_WIDTH:
+            return False
+        elif 0 > y or y >= DIGIT_DATUM_HEIGHT:
+            return False
+
+        if datum.getPixel(x, y) >= 1:
+            return True
+
+        if (x, y) in seen:
+            return True
+        
+        seen.add((x, y))
+
+        out = True
+
+        for new_x, new_y in [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]:
+            if (new_x, new_y) not in seen and not is_surrounded(new_x, new_y):
+                out = False
+
+        return out
+
+    seen = set()
+
+    for y in range(DIGIT_DATUM_HEIGHT):
+        for x in range(DIGIT_DATUM_WIDTH):
+            if (x, y) not in seen and datum.getPixel(x, y) == 0 and (is_surrounded(x, y)):
+                features["has_hole"] = True
+                break
+            # print(x, y, datum.getPixel(x, y) == 0 and (is_surrounded(x, y)))
+
+    print(datum.getAsciiString())
+    print(f"{features['left_side_heavy']}")
+    print(f"{features['right_side_heavy']}")
 
     return features
 
