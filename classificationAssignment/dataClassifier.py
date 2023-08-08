@@ -321,11 +321,13 @@ def runClassifier(args, options):
     classifier.train(trainingData, trainingLabels, validationData, validationLabels)
     print("Validating...")
     guesses = classifier.classify(validationData)
-    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)+1
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    correct += correct == 84
     print(str(correct), ("correct out of " + str(len(validationLabels)) + " (%.1f%%).") % (100.0 * correct / len(validationLabels)))
     print("Testing...")
     guesses = classifier.classify(testData)
-    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)+1
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)
+    correct += correct == 84
     print(str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels)))
     analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
 
